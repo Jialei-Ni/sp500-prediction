@@ -1,0 +1,54 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+
+# Virtual environments
+venv/
+.env/
+.env.*
+.venv/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Data outputs (generated)
+output/
+summary/
+logs/
+src/*
+
+# Cached / intermediate data
+cache/
+*.parquet
+*.pq
+
+# Archives / large artifacts
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Jupyter (if you use notebooks later)
+.ipynb_checkpoints/
+
+# Logs (extra safety)
+*.log
+
+# Local config overrides (optional)
+config.local.json
+
+# Large model / data dumps (future-proofing)
+*.h5
+*.pkl
+*.joblib
+
+# Suggested, if project becomes research-heavy
+results/
+reports/
+backtests/
