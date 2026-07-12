@@ -24,6 +24,7 @@ logs/
 src/*
 
 # Cached / intermediate data
+src/
 cache/
 *.parquet
 *.pq
@@ -52,3 +53,7 @@ config.local.json
 results/
 reports/
 backtests/
+
+# Others
+to_extract.txt
+fred_api_key.py
