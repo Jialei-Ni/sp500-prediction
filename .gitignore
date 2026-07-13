@@ -25,7 +25,7 @@ src/*
 
 # Cached / intermediate data
 src/
-cache/
+cache/*
 *.parquet
 *.pq
 
@@ -55,5 +55,8 @@ reports/
 backtests/
 
 # Others
-to_extract.txt
-fred_api_key.py
+private
+# fred_api_key.py
+
+# .gitkeep
+!.gitkeep
