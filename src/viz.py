@@ -113,3 +113,64 @@ def plot_yearly_bars(ret: pd.Series, *, ax: Optional[plt.Axes] = None) -> plt.Ax
     ax.set_ylabel("return (%)")
     ax.grid(alpha=0.25, axis="y")
     return ax
+
+
+def plot_position(
+    position: pd.Series,
+    *,
+    ax: Optional[plt.Axes] = None,
+    direction_only: bool = False,
+    max_leverage: Optional[float] = None,
+) -> plt.Axes:
+    """Signed exposure over time.
+
+    Long stretches are shaded above the zero line, short stretches below it, and
+    flat stretches collapse onto the zero line. Because the backtest position is
+    piecewise-constant (refreshed every H days and held in between), the series
+    is drawn as steps.
+
+    By default the *actual* vol-targeted exposure is plotted, so leverage is
+    visible. Pass ``direction_only=True`` to collapse it to long/flat/short at
+    +1/0/-1 (a pure regime strip).
+    """
+    pos = position.dropna()
+    if direction_only:
+        pos = np.sign(pos)
+
+    if ax is None:
+        _, ax = plt.subplots(figsize=(11, 2.5))
+
+    idx = pos.index
+    vals = pos.to_numpy(dtype=float)
+
+    long_c, short_c, flat_c = "#2a9d8f", "#d1495b", "#c9c9c9"
+
+    ax.fill_between(idx, vals, 0.0, where=vals > 0, step="post",
+                    color=long_c, alpha=0.65, linewidth=0)
+    ax.fill_between(idx, vals, 0.0, where=vals < 0, step="post",
+                    color=short_c, alpha=0.65, linewidth=0)
+    ax.step(idx, vals, where="post", color="#333333", lw=0.6)
+    ax.axhline(0.0, color="k", lw=0.8)
+
+    if max_leverage is not None and not direction_only:
+        ax.axhline(max_leverage, color="#555555", lw=0.7, ls="--", alpha=0.6)
+        ax.axhline(-max_leverage, color="#555555", lw=0.7, ls="--", alpha=0.6)
+
+    if direction_only:
+        ax.set_yticks([-1, 0, 1], ["short", "flat", "long"])
+        ax.set_ylim(-1.5, 1.5)
+        ax.set_title("Position (direction)")
+    else:
+        ax.set_ylabel("exposure (× equity)")
+        ax.set_title("Position (signed exposure)")
+
+    long_frac = float((vals > 0).mean())
+    short_frac = float((vals < 0).mean())
+    flat_frac = float((vals == 0).mean())
+    ax.legend(handles=[
+        Patch(facecolor=long_c, alpha=0.65, label=f"long  ({long_frac:.0%})"),
+        Patch(facecolor=short_c, alpha=0.65, label=f"short ({short_frac:.0%})"),
+        Patch(facecolor=flat_c, label=f"flat  ({flat_frac:.0%})"),
+    ], loc="upper left", ncol=3, fontsize=8, framealpha=0.9)
+    ax.grid(alpha=0.25, axis="y")
+    return ax
