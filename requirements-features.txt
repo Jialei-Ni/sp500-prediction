@@ -1,0 +1,3 @@
+# Feature stage (in addition to requirements-data.txt)
+stockstats        # technical indicators
+# holidays use pandas' built-in USFederalHolidayCalendar (no extra dependency)

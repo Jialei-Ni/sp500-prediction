@@ -4,12 +4,15 @@ __pycache__/
 *.pyo
 *.pyd
 *.pytest_cache/
+.ipynb_checkpoints/
 
 # Virtual environments
 venv/
 .env/
 .env.*
 .venv/
+# single file
+.env
 
 # OS / editor noise
 .DS_Store
@@ -21,10 +24,8 @@ Thumbs.db
 output/
 summary/
 logs/
-src/*
 
 # Cached / intermediate data
-src/
 cache/*
 *.parquet
 *.pq

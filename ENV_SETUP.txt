@@ -1,0 +1,36 @@
+============================================================================
+PROJECT-LOCAL API KEY SETUP (No system environment variable needed)
+============================================================================
+
+1. Get your FRED API key from https://fredaccount.stlouisfed.org/login/secure/
+
+2. In your project root (same folder as config.yaml), create a file named `.env`
+   (yes, it starts with a dot — it's a hidden file on Unix/Linux/Mac).
+   
+   If you're on Windows and your explorer won't let you create a file starting
+   with a dot, do it from the command line:
+   
+     cd C:\Users\jackshang\Desktop\Projects\sp500-prediction
+     copy .env.example .env
+   
+   Then edit `.env` in your text editor.
+
+3. Inside `.env`, add your FRED API key on a single line:
+   
+     FRED_API_KEY=your-actual-fred-api-key-here
+   
+   Replace "your-actual-fred-api-key-here" with the real 32-character key.
+
+4. Save the file. That's it. The pipeline will load it automatically when you
+   run the notebook (via `config.cfg.fred_api_key` → resolves from .env).
+
+5. DO NOT commit `.env` to git — it's already in .gitignore. This keeps your
+   key out of version control.
+
+Resolution order (in case you ever have multiple sources):
+  1. System environment variable (if set) — not required
+  2. Project-local .env file (recommended)
+  3. Legacy fred_api_key.py module (backward compatibility)
+
+For more on `.env` files, see python-dotenv docs:
+  https://python-dotenv.readthedocs.io/

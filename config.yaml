@@ -1,0 +1,48 @@
+# ---------------------------------------------------------------------------
+# Pipeline configuration (acquisition stage).
+# Ticker lists live in the existing root config modules (index_ticker.py,
+# fred_macro.py); this file holds run parameters. Later stages (features,
+# models, backtest) will extend this file.
+# ---------------------------------------------------------------------------
+
+dates:
+  start: "2000-01-01"        # first modelled date
+  end: "2026-06-30"
+  # Fetch reference/macro series a little earlier so forward-fill has values to
+  # carry into the first modelled dates.
+  ref_start: "1999-12-20"
+
+features:
+  vvix_min_start: "2007-01-01"   # if start < this, VVIX is dropped
+  return_windows: [1, 5, 10, 20, 60, 120]
+  vol_windows: [5, 10, 20, 60]
+  use_technicals: true
+  use_fomc: true
+
+target:
+  # trading-day horizons: week / month / quarter
+  horizons: {week: 5, month: 21, quarter: 63}
+  n_buckets: 5
+  bucket_method: "percentile"          # percentile | fixed
+  fixed_bins: [-0.03, -0.01, 0.01, 0.03]   # interior edges when method="fixed"
+
+model:
+  names: ["logistic_clf", "histgbm_clf", "ridge_reg", "histgbm_reg"]
+  n_folds: 6
+  min_train_frac: 0.4
+
+cache:
+  dir: "cache"                   # relative to PROJECT_ROOT
+  # File names / formats. Parquet preserves MultiIndex columns + dtypes.
+  indices_file: "indices_raw.parquet"
+  macro_file: "macro_raw.parquet"
+  fomc_file: "fomc_calendar_2000_present.csv"
+  features_file: "features.parquet"
+  targets_file: "targets.parquet"
+  signals_file: "oos_signals.parquet"
+  metrics_file: "walkforward_metrics.csv"
+
+acquire:
+  force_refresh: false           # set true to bypass caches and re-download
+  fred_api_key_env: "FRED_API_KEY"   # env var name holding the FRED key
+  request_pause_sec: 0.5         # gentle rate-limiting between requests

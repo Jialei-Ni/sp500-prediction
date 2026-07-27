@@ -1,0 +1,4 @@
+# Model stage (in addition to requirements-data.txt + requirements-features.txt)
+scikit-learn      # logistic, ridge, HistGradientBoosting
+scipy             # Spearman rank IC
+matplotlib        # IC bar chart
