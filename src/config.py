@@ -43,6 +43,7 @@ class Config:
     model_names: list
     n_folds: int
     min_train_frac: float
+    backtest: dict
     force_refresh: bool
     fred_api_key_env: str
     request_pause_sec: float
@@ -110,6 +111,7 @@ def load_config(path: str | Path = "config.yaml") -> Config:
         model_names=mdl.get("names", ["logistic_clf", "histgbm_clf", "ridge_reg", "histgbm_reg"]),
         n_folds=mdl.get("n_folds", 6),
         min_train_frac=mdl.get("min_train_frac", 0.4),
+        backtest=raw.get("backtest", {}),
         force_refresh=raw["acquire"]["force_refresh"],
         fred_api_key_env=raw["acquire"]["fred_api_key_env"],
         request_pause_sec=raw["acquire"]["request_pause_sec"],

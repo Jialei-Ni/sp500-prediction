@@ -1,9 +1,0 @@
-# Data-acquisition stage dependencies
-pandas
-pyarrow          # parquet caching (preserves MultiIndex columns + dtypes)
-pyyaml           # config.yaml
-python-dotenv     # loads project-local .env for FRED_API_KEY
-yfinance         # price panel
-pyfredapi        # FRED macro
-requests         # FOMC scraper
-beautifulsoup4   # FOMC scraper

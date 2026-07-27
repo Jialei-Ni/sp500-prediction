@@ -1,0 +1,13 @@
+# Full pipeline (consolidated). Per-stage files also included for reference.
+pandas
+numpy
+pyarrow            # parquet caches (MultiIndex columns + dtypes)
+pyyaml             # config.yaml
+yfinance           # 00: price panel
+pyfredapi          # 00: FRED macro
+requests           # 00: FOMC scraper
+beautifulsoup4     # 00: FOMC scraper
+stockstats         # 01: technical indicators
+scikit-learn       # 02: logistic, ridge, HistGradientBoosting
+scipy              # 02: Spearman rank IC
+matplotlib         # 03: charts

@@ -31,6 +31,19 @@ model:
   n_folds: 6
   min_train_frac: 0.4
 
+backtest:
+  signal: null                     # e.g. "histgbm_clf__h21"; null = auto-pick best by non-overlap IC
+  positioning: "long_short_flat"   # long_short_flat | long_flat
+  sizing: "vol_target"             # vol_target | fixed
+  target_vol: 0.10                 # annualised risk target
+  max_leverage: 3.0
+  deadband: 0.0                    # |signal| below this -> flat
+  vol_lookback: 20                 # trailing days for the vol estimate
+  conviction: false                # also scale exposure by normalised |signal|
+  cost_bps: 10                     # per-turnover transaction cost (configurable)
+  roll: "quarterly"
+  roll_cost_bps: 0                 # optional extra cost on roll dates
+
 cache:
   dir: "cache"                   # relative to PROJECT_ROOT
   # File names / formats. Parquet preserves MultiIndex columns + dtypes.
