@@ -46,8 +46,11 @@ def _direction(signal: pd.Series, positioning: str, deadband: float) -> pd.Serie
         d = np.where(signal > deadband, 1.0, 0.0)
     elif positioning == "long_short_flat":
         d = np.where(signal > deadband, 1.0, np.where(signal < -deadband, -1.0, 0.0))
+    elif positioning == "short_flat":
+        d = np.where(signal < deadband, -1.0, 0.0)
+        pass
     else:
-        raise ValueError("positioning must be 'long_short_flat' or 'long_flat'")
+        raise ValueError("positioning must be 'long_short_flat', 'long_flat', or 'short_flat'")
     return pd.Series(d, index=signal.index)
 
 

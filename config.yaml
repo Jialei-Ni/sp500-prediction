@@ -33,7 +33,7 @@ model:
 
 backtest:
   signal: null                     # e.g. "histgbm_clf__h21"; null = auto-pick best by non-overlap IC
-  positioning: "long_short_flat"   # long_short_flat | long_flat
+  positioning: "long_short_flat"   # long_short_flat | long_flat | short_flat
   sizing: "vol_target"             # vol_target | fixed
   target_vol: 0.10                 # annualised risk target
   max_leverage: 3.0
