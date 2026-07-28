@@ -95,6 +95,7 @@ def make_positions(
     daily_ret: pd.Series,
     *,
     H: int,
+    hold: Optional[int] = None,
     positioning: str = "long_short_flat",
     sizing: str = "vol_target",
     target_vol: float = 0.10,
@@ -124,9 +125,13 @@ def make_positions(
         scale = sig.abs().expanding().std().shift(1)
         w = (sig.abs() / scale).clip(upper=1.0).fillna(0.0)
         target = target * w
+    
+    hold = H if hold is None else int(hold)
+    if hold < 1:
+        raise ValueError("hold must be >= 1")
 
-    # Refresh only on rebalance dates (every H-th trading day); hold in between.
-    rebal = idx[::H]
+    # Refresh only on rebalance dates (every `hold`-th trading day); hold in between.
+    rebal = idx[::hold]
     pos = pd.Series(np.nan, index=idx)
     pos.loc[rebal] = target.loc[rebal]
     return pos.ffill().fillna(0.0)

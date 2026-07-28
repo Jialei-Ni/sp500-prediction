@@ -41,6 +41,7 @@ backtest:
   vol_lookback: 20                 # trailing days for the vol estimate
   conviction: false                # also scale exposure by normalised |signal|
   cost_bps: 10                     # per-turnover transaction cost (configurable)
+  hold: null                       # holding period in trading days; null = use signal horizon H
   roll: "quarterly"
   roll_cost_bps: 0                 # optional extra cost on roll dates
 
