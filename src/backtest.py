@@ -25,21 +25,57 @@ Everything is in % of equity, so the specific contract (ES vs MES) is cosmetic.
 
 from __future__ import annotations
 
-from typing import Optional
+import re
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 
 
-def quarterly_roll_dates(index: pd.DatetimeIndex) -> pd.DatetimeIndex:
-    """Last trading day of Mar/Jun/Sep/Dec within `index` (roll proxy)."""
-    s = pd.Series(index, index=index)
-    is_roll_month = index.month.isin([3, 6, 9, 12])
-    monthly_last = s[is_roll_month].groupby(
-        [index[is_roll_month].year, index[is_roll_month].month]
-    ).max()
-    return pd.DatetimeIndex(sorted(monthly_last.values))
+def roll_dates(index: pd.DatetimeIndex,
+               roll: Union[str, int, None]) -> pd.DatetimeIndex:
+    """Roll (cost) dates within `index`.
 
+    roll may be:
+      - None / "none" / False -> no rolls
+      - "quarterly" / "q"     -> last trading day of Mar/Jun/Sep/Dec (ES/MES cycle)
+      - "monthly"   / "m"     -> last trading day of each month
+      - "weekly"    / "w"     -> last trading day of each ISO week
+      - int N  or  "<N>d"     -> every N trading days
+    The opening day of `index` is never a roll (that is the entry).
+    """
+    if roll is None or roll is False:
+        return pd.DatetimeIndex([])
+    idx = pd.DatetimeIndex(index)
+
+    def _last_per(sub, keys):
+        if len(sub) == 0:
+            return pd.DatetimeIndex([])
+        s = pd.Series(sub, index=sub)
+        return pd.DatetimeIndex(sorted(s.groupby(list(keys)).max().values))
+
+    if isinstance(roll, (int, np.integer)) and not isinstance(roll, bool):
+        if int(roll) < 1:
+            raise ValueError("integer roll must be >= 1")
+        dates = idx[::int(roll)]
+    else:
+        r = str(roll).strip().lower()
+        if r in ("none", ""):
+            return pd.DatetimeIndex([])
+        elif r in ("quarterly", "q"):
+            sub = idx[idx.month.isin([3, 6, 9, 12])]
+            dates = _last_per(sub, [sub.year, sub.month])
+        elif r in ("monthly", "m"):
+            dates = _last_per(idx, [idx.year, idx.month])
+        elif r in ("weekly", "w"):
+            iso = idx.isocalendar()
+            dates = _last_per(idx, [iso.year.to_numpy(), iso.week.to_numpy()])
+        else:
+            m = re.fullmatch(r"(\d+)\s*d", r)
+            if not m:
+                raise ValueError(f"unrecognised roll spec: {roll!r}")
+            dates = idx[::int(m.group(1))]
+    return dates[dates != idx[0]]
 
 def _direction(signal: pd.Series, positioning: str, deadband: float) -> pd.Series:
     if positioning == "long_flat":
@@ -117,10 +153,10 @@ def run_backtest(
     turnover.iloc[0] = abs(pos.iloc[0])
     cost = turnover * (cost_bps / 1e4)
 
-    if roll == "quarterly" and roll_cost_bps:
-        roll_dates = quarterly_roll_dates(daily_ret.index)
+    if roll_cost_bps and roll not in (None, False, "none"):
+        rdates = roll_dates(daily_ret.index, roll)
         rc = pd.Series(0.0, index=daily_ret.index)
-        hit = daily_ret.index.intersection(roll_dates)
+        hit = daily_ret.index.intersection(rdates)
         rc.loc[hit] = pos.abs().loc[hit] * (roll_cost_bps / 1e4)
         cost = cost + rc
 
